@@ -1,9 +1,5 @@
 c:\users\vittesd\documents\visual studio 2012\Projects\CoreDataBase\CoreDataBase\bin\Debug\CoreDataBase.dacpac
 c:\users\vittesd\documents\visual studio 2012\Projects\CoreDataBase\CoreDataBase\bin\Debug\CoreDataBase.dll
 c:\users\vittesd\documents\visual studio 2012\Projects\CoreDataBase\CoreDataBase\bin\Debug\CoreDataBase.pdb
-c:\users\vittesd\documents\visual studio 2012\Projects\CoreDataBase\CoreDataBase\obj\Debug\Model.xml
-c:\users\vittesd\documents\visual studio 2012\Projects\CoreDataBase\CoreDataBase\obj\Debug\refactor.xml
-c:\users\vittesd\documents\visual studio 2012\Projects\CoreDataBase\CoreDataBase\obj\Debug\postdeploy.sql
-c:\users\vittesd\documents\visual studio 2012\Projects\CoreDataBase\CoreDataBase\obj\Debug\predeploy.sql
 c:\users\vittesd\documents\visual studio 2012\Projects\CoreDataBase\CoreDataBase\obj\Debug\CoreDataBase.dll
 c:\users\vittesd\documents\visual studio 2012\Projects\CoreDataBase\CoreDataBase\obj\Debug\CoreDataBase.pdb

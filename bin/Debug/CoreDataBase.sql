@@ -36,91 +36,77 @@ IF N'$(__IsSqlCmdEnabled)' NOT LIKE N'True'
 
 
 GO
-IF EXISTS (SELECT 1
-           FROM   [master].[dbo].[sysdatabases]
-           WHERE  [name] = N'$(DatabaseName)')
-    BEGIN
-        ALTER DATABASE [$(DatabaseName)]
-            SET ANSI_NULLS ON,
-                ANSI_PADDING ON,
-                ANSI_WARNINGS ON,
-                ARITHABORT ON,
-                CONCAT_NULL_YIELDS_NULL ON,
-                QUOTED_IDENTIFIER ON,
-                ANSI_NULL_DEFAULT ON,
-                CURSOR_DEFAULT LOCAL 
-            WITH ROLLBACK IMMEDIATE;
-        
-    END
-
-
-GO
-IF EXISTS (SELECT 1
-           FROM   [master].[dbo].[sysdatabases]
-           WHERE  [name] = N'$(DatabaseName)')
-    BEGIN
-        ALTER DATABASE [$(DatabaseName)]
-            SET PAGE_VERIFY NONE,
-                DISABLE_BROKER 
-            WITH ROLLBACK IMMEDIATE;
-    END
-
-
-GO
 USE [$(DatabaseName)];
 
 
 GO
-PRINT N'Creating [dbo].[profile]...';
+/*
+The type for column created_date in table [dbo].[tempate] is currently  ROWVERSION NULL but is being changed to  DATETIME NULL. Data loss could occur.
+*/
+
+IF EXISTS (select top 1 1 from [dbo].[tempate])
+    RAISERROR (N'Rows were detected. The schema update is terminating because data loss might occur.', 16, 127) WITH NOWAIT
+
+GO
+PRINT N'Dropping DF__profile__created__1A14E395...';
 
 
 GO
-CREATE TABLE [dbo].[profile] (
-    [Id]           INT          IDENTITY (1, 1) NOT NULL,
-    [user_id]      NCHAR (10)   NULL,
-    [registerno]   NCHAR (10)   NOT NULL,
-    [nic]          NCHAR (10)   NOT NULL,
-    [email]        VARCHAR (50) NOT NULL,
-    [address]      VARCHAR (50) NULL,
-    [mobile_no]    VARCHAR (50) NULL,
-    [home_no]      VARCHAR (50) NULL,
-    [created_date] TIMESTAMP    NULL,
-    [created_user] INT          NULL,
-    [updated_date] DATETIME     NULL,
-    [updated_user] INT          NULL,
+ALTER TABLE [dbo].[profile] DROP CONSTRAINT [DF__profile__created__1A14E395];
+
+
+GO
+PRINT N'Dropping DF__user__created_da__1B0907CE...';
+
+
+GO
+ALTER TABLE [dbo].[user] DROP CONSTRAINT [DF__user__created_da__1B0907CE];
+
+
+GO
+PRINT N'Starting rebuilding table [dbo].[tempate]...';
+
+
+GO
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+SET XACT_ABORT ON;
+
+CREATE TABLE [dbo].[tmp_ms_xx_tempate] (
+    [Id]           INT      IDENTITY (1, 1) NOT NULL,
+    [created_date] DATETIME DEFAULT CURRENT_TIMESTAMP NULL,
+    [created_user] INT      NULL,
+    [updated_date] DATETIME NULL,
+    [updated_user] INT      NULL,
+    [is_delete]    BIT      DEFAULT 0 NOT NULL,
     PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
+IF EXISTS (SELECT TOP 1 1 
+           FROM   [dbo].[tempate])
+    BEGIN
+        SET IDENTITY_INSERT [dbo].[tmp_ms_xx_tempate] ON;
+        INSERT INTO [dbo].[tmp_ms_xx_tempate] ([Id], [created_date], [created_user], [updated_date], [updated_user], [is_delete])
+        SELECT   [Id],
+                 [created_date],
+                 [created_user],
+                 [updated_date],
+                 [updated_user],
+                 [is_delete]
+        FROM     [dbo].[tempate]
+        ORDER BY [Id] ASC;
+        SET IDENTITY_INSERT [dbo].[tmp_ms_xx_tempate] OFF;
+    END
 
-GO
-PRINT N'Creating [dbo].[tempate]...';
+DROP TABLE [dbo].[tempate];
 
+EXECUTE sp_rename N'[dbo].[tmp_ms_xx_tempate]', N'tempate';
 
-GO
-CREATE TABLE [dbo].[tempate] (
-    [Id]           INT       IDENTITY (1, 1) NOT NULL,
-    [created_date] TIMESTAMP NULL,
-    [created_user] INT       NULL,
-    [updated_date] DATETIME  NULL,
-    [updated_user] INT       NULL,
-    [is_delete]    BIT       NOT NULL,
-    PRIMARY KEY CLUSTERED ([Id] ASC)
-);
+COMMIT TRANSACTION;
 
-
-GO
-PRINT N'Creating [dbo].[user]...';
-
-
-GO
-CREATE TABLE [dbo].[user] (
-    [Id]           INT          IDENTITY (1, 1) NOT NULL,
-    [username]     VARCHAR (50) NULL,
-    [password]     VARCHAR (50) NULL,
-    [created_date] TIMESTAMP    NULL,
-    [created_user] INT          NULL,
-    PRIMARY KEY CLUSTERED ([Id] ASC)
-);
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
 
 
 GO
@@ -133,30 +119,12 @@ ALTER TABLE [dbo].[profile]
 
 
 GO
-PRINT N'Creating Default Constraint on [dbo].[tempate]....';
-
-
-GO
-ALTER TABLE [dbo].[tempate]
-    ADD DEFAULT CURRENT_TIMESTAMP FOR [created_date];
-
-
-GO
-PRINT N'Creating Default Constraint on [dbo].[tempate]....';
-
-
-GO
-ALTER TABLE [dbo].[tempate]
-    ADD DEFAULT 0 FOR [is_delete];
-
-
-GO
 PRINT N'Creating Default Constraint on [dbo].[user]....';
 
 
 GO
 ALTER TABLE [dbo].[user]
-    ADD DEFAULT Current_timestamp FOR [created_date];
+    ADD DEFAULT CURRENT_TIMESTAMP FOR [created_date];
 
 
 GO

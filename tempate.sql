@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[tempate]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
-    [created_date] TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, 
+    [created_date] DATETIME NULL DEFAULT CURRENT_TIMESTAMP, 
     [created_user] INT NULL, 
     [updated_date] DATETIME NULL, 
     [updated_user] INT NULL, 
