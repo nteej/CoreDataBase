@@ -54,4 +54,9 @@
   <ItemGroup>
     <Folder Include="Properties" />
   </ItemGroup>
+  <ItemGroup>
+    <Build Include="users.sql" />
+    <Build Include="profile.sql" />
+    <Build Include="tempate.sql" />
+  </ItemGroup>
 </Project>
