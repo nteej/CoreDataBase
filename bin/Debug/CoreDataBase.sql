@@ -40,73 +40,27 @@ USE [$(DatabaseName)];
 
 
 GO
-/*
-The type for column created_date in table [dbo].[tempate] is currently  ROWVERSION NULL but is being changed to  DATETIME NULL. Data loss could occur.
-*/
-
-IF EXISTS (select top 1 1 from [dbo].[tempate])
-    RAISERROR (N'Rows were detected. The schema update is terminating because data loss might occur.', 16, 127) WITH NOWAIT
-
-GO
-PRINT N'Dropping DF__profile__created__1A14E395...';
+PRINT N'Dropping DF__profile__created__1FCDBCEB...';
 
 
 GO
-ALTER TABLE [dbo].[profile] DROP CONSTRAINT [DF__profile__created__1A14E395];
+ALTER TABLE [dbo].[profile] DROP CONSTRAINT [DF__profile__created__1FCDBCEB];
 
 
 GO
-PRINT N'Dropping DF__user__created_da__1B0907CE...';
+PRINT N'Dropping DF__tmp_ms_xx__creat__1DE57479...';
 
 
 GO
-ALTER TABLE [dbo].[user] DROP CONSTRAINT [DF__user__created_da__1B0907CE];
+ALTER TABLE [dbo].[tempate] DROP CONSTRAINT [DF__tmp_ms_xx__creat__1DE57479];
 
 
 GO
-PRINT N'Starting rebuilding table [dbo].[tempate]...';
+PRINT N'Dropping DF__user__created_da__20C1E124...';
 
 
 GO
-BEGIN TRANSACTION;
-
-SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
-
-SET XACT_ABORT ON;
-
-CREATE TABLE [dbo].[tmp_ms_xx_tempate] (
-    [Id]           INT      IDENTITY (1, 1) NOT NULL,
-    [created_date] DATETIME DEFAULT CURRENT_TIMESTAMP NULL,
-    [created_user] INT      NULL,
-    [updated_date] DATETIME NULL,
-    [updated_user] INT      NULL,
-    [is_delete]    BIT      DEFAULT 0 NOT NULL,
-    PRIMARY KEY CLUSTERED ([Id] ASC)
-);
-
-IF EXISTS (SELECT TOP 1 1 
-           FROM   [dbo].[tempate])
-    BEGIN
-        SET IDENTITY_INSERT [dbo].[tmp_ms_xx_tempate] ON;
-        INSERT INTO [dbo].[tmp_ms_xx_tempate] ([Id], [created_date], [created_user], [updated_date], [updated_user], [is_delete])
-        SELECT   [Id],
-                 [created_date],
-                 [created_user],
-                 [updated_date],
-                 [updated_user],
-                 [is_delete]
-        FROM     [dbo].[tempate]
-        ORDER BY [Id] ASC;
-        SET IDENTITY_INSERT [dbo].[tmp_ms_xx_tempate] OFF;
-    END
-
-DROP TABLE [dbo].[tempate];
-
-EXECUTE sp_rename N'[dbo].[tmp_ms_xx_tempate]', N'tempate';
-
-COMMIT TRANSACTION;
-
-SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+ALTER TABLE [dbo].[user] DROP CONSTRAINT [DF__user__created_da__20C1E124];
 
 
 GO
@@ -115,6 +69,15 @@ PRINT N'Creating Default Constraint on [dbo].[profile]....';
 
 GO
 ALTER TABLE [dbo].[profile]
+    ADD DEFAULT CURRENT_TIMESTAMP FOR [created_date];
+
+
+GO
+PRINT N'Creating Default Constraint on [dbo].[tempate]....';
+
+
+GO
+ALTER TABLE [dbo].[tempate]
     ADD DEFAULT CURRENT_TIMESTAMP FOR [created_date];
 
 
